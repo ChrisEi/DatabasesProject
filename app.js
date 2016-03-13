@@ -60,6 +60,6 @@ app.get('/', function(req, res) {
 });
 
 // Start server
-app.listen(9001, function() {
+app.listen(80, function() {
   console.log('Server listening on port 80!');
 });
