@@ -1,0 +1,19 @@
+{
+  "name": "databasesproject",
+  "version": "1.0.0",
+  "description": "A Magic the Gathering based MySQL database application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChrisEi/DatabasesProject.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChrisEi/DatabasesProject/issues"
+  },
+  "homepage": "https://github.com/ChrisEi/DatabasesProject#readme"
+}
