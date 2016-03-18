@@ -58,6 +58,10 @@ app.get('/', function(req, res) {
   res.sendFile(__dirname + '/public/index.html')
 //  handle_database(req,res);
 });
+app.get('/profile', function(req, res) {
+  res.sendFile(__dirname + '/public/profile.html')
+//  handle_database(req,res);
+});
 
 // Start server
 app.listen(9001, function() {

@@ -3,3 +3,8 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+.well {
+  background-color: rgba(0, 0, 0, .85);
+  color: white;
+}
