@@ -66,6 +66,10 @@ app.get('/decks', function(req, res) {
   res.sendFile(__dirname + '/public/decks.html')
 //  handle_database(req,res);
 });
+app.get('/trade', function(req, res) {
+  res.sendFile(__dirname + '/public/trades.html')
+//  handle_database(req,res);
+});
 
 // Start server
 app.listen(9001, function() {
