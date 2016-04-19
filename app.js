@@ -9,7 +9,7 @@ var pool = mysql.createPool({
   host : 'localhost',
   user : 'root',
   password : 'pass',
-  database : 'hackmaster'
+  database : 'magic'
 });
 
 // Simple get from db test
