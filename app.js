@@ -10,6 +10,8 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', './views');
 app.set('view engine', 'pug');
 
+var router = express.Router();
+
 // Output html that doesnt look like shit
 app.locals.pretty = true;
 
@@ -33,17 +35,21 @@ app.get('/', function(req, res) {
   // Aquire all cardnames in database, then send that json along
   // This is a horrific thing to do and will slow down the website dramtically
   // ... probably.
-  var data = {cards: []};
-  con.query('SELECT name FROM mtgcard', function(err, rows){
+  var data = {name: [], id: [], setCode: [], setNum: []};
+  con.query('SELECT name, id, setCode, setNumber FROM mtgcard', function(err, rows){
     if(err) throw err;
-    // Clean up the response rows into a nice usable JSON array
-    var data = {cards: []};
+    // Clean up the response rows into a nice usable JSON object
     //for (var i = 0; i < rows.length; i++) {
     for (var i = 0; i < 10; i++) {
-      var row = rows[i].name;
-      //console.log("A", row);
-      data.cards.push(row);
-      //console.log("B", data.cards[i]);
+      var n = rows[i].name;
+      var ident = rows[i].id;
+      var sC = rows[i].setCode;
+      var sN = rows[i].setNumber;
+      data.name.push(n);
+      data.id.push(ident);
+      data.setCode.push(sC);
+      data.setNum.push(sN);
+      //console.log(data[i]);
     }
     // res.render goes here for synchronous execution reasons
     res.render('index', data);
@@ -61,9 +67,119 @@ app.get('/trade', function(req, res) {
   res.sendFile(__dirname + '/public/trades.html')
 //  handle_database(req,res);
 });
-app.get('/test', function(req, res) {
-  res.sendFile(__dirname + '/public/test.html')
-//  handle_database(req,res);
+app.get('/:id\([0-9]+\)', function(req, res) {
+  var data = {key: "Ayyy lmao"}
+  //console.log(Object.keys(req));
+  var cardNumber = req.url.slice(1);
+  console.log("Fetching card number: ", cardNumber);
+  var data = {};
+  con.query('SELECT * FROM mtgcard WHERE id = ' + cardNumber, function(err, rows){
+    if(err) throw err;
+    // Clean up the response row into a nice usable JSON object
+
+    // Get the unique ID
+    data.id = cardNumber;
+
+    // Get the card name
+    data.name = rows[0].name;
+
+    // Get the mana cost
+    if (rows[0].setNumber) {
+      data.manaCost = rows[0].manaCost;
+    } else {
+      data.manaCost = "None";
+    }
+
+    // Get the converted mana cost
+    if (rows[0].cmc) {
+      data.cmc = rows[0].cmc;
+    } else {
+      data.cmc = "Unknown";
+    }
+
+    // Get the type
+    data.type = rows[0].type;
+
+    // Get the rarity
+    if (rows[0].rarity) {
+      data.rarity = rows[0].rarity;
+    } else {
+      data.rarity = "Unknown";
+    }
+
+    // Get the cardText
+    if (rows[0].cardText) {
+      data.cardText = rows[0].cardText;
+    } else {
+      data.cardText = "Blank";
+    }
+
+    // Get the flavor text
+    if (rows[0].flavor) {
+      data.flavor = rows[0].flavor;
+    } else {
+      data.flavor = "None";
+    }
+
+    // Get the card's number within the set
+    if (rows[0].setNumber) {
+      data.setNum = rows[0].setNumber;
+    } else {
+      data.setNum = "Unknown";
+    }
+
+    // Get the card's set's name
+    if (rows[0].setName) {
+      data.setName = rows[0].setName;
+    } else {
+      data.setName = "Unknown";
+    }
+
+    // Get the card's set's image code
+    if (rows[0].setCode) {
+      data.setCode = rows[0].setCode;
+    } else {
+      data.setCode = "Unknown";
+    }
+
+    // Get the card's power
+    if (rows[0].power) {
+      data.power = rows[0].power;
+    } else {
+      data.power = "Not Applicable";
+    }
+
+    // Get the card's toughness
+    if (rows[0].toughness) {
+      data.toughness = rows[0].toughness;
+    } else {
+      data.toughness = "Not Applicable";
+    }
+
+    // Get the card's hand cost
+    if (rows[0].hand) {
+      data.hand = rows[0].hand;
+    } else {
+      data.hand = "Not Applicable";
+    }
+
+    // Get the card's life cost
+    if (rows[0].life) {
+      data.life = rows[0].life;
+    } else {
+      data.life = "Not Applicable";
+    }
+
+    // Get the card's release date
+    if (rows[0].releaseDate) {
+      data.releaseDate = rows[0].releaseDate;
+    } else {
+      data.releaseDate = "Unknown";
+    }
+
+    // Render page!
+    res.render('cardView', data);
+  });
 });
 
 // Start server

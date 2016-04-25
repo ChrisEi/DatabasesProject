@@ -25,7 +25,7 @@ html(lang='en')
         .navbar-header
           a.navbar-brand(href='/') Databases
         ul.nav.navbar-nav
-          li.active
+          li
             a(href='/') Home
           li
             a(href='/profile') Profile
@@ -35,19 +35,31 @@ html(lang='en')
             a(href='/trade') Manage Cards
     .container
       .row
-        .well.m_well.text-center.col-sm-offset-2.col-sm-8
-          form.form(role='form')
-            .form-group
-              label.control-label.col-md-2(for='search') Search Cards:
-              .col-md-10
-                input#search.form-control(type='search', placeholder='search')
-                ul.bumper
-                  each n, i in name
-                    li
-                      a(href='/'+ id[i])
-                        .well.list-well #{n} #{id[i]}
-            // button type="submit" class="btn btn-default console">Submit</button>
-    // closing main container div
+        .col-sm-offset-4.col-sm-4
+          img(src= "http://magiccards.info/scans/en/" + setCode + "/" + setNum + ".jpg", onerror= 'this.src="img/m_cardBack.jpg"').cardBumper
+      .row
+        .col-sm-offset-2.col-sm-8
+          .well.m_well.text-center.col-sm-offset-2.col-sm-8
+            h3 #{name}
+            h3 #{type}
+      .row
+        .col-sm-offset-2.col-sm-8
+          .well.m_well.text-center.col-sm-offset-2.col-sm-8
+            .row
+              p.col-sm-6 Power: #{power}
+              p.col-sm-6 Toughness: #{toughness}
+            .row
+              p.col-sm-6 Mana Cost: #{manaCost}
+              p.col-sm-6 Converted Mana Cost: #{cmc}
+            .row
+              p.col-sm-6 Life Penalty: #{life}
+              p.col-sm-6 Hand Penalty: #{hand}
+            p Text: #{cardText}
+            p Flavor: 
+              i #{flavor}
+            p From set: #{setName}, Card No. #{setNum}
+            p Rarity: #{rarity}
+            p Released: #{releaseDate}
     // jQuery (necessary for Bootstrap's JavaScript plugins)
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js')
     // Include all compiled plugins (below), or include individual files as needed
