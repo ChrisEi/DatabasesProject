@@ -10,6 +10,14 @@
 }
 
 img {
-    border-radius: 8px;
-    width: 95%;
+  border-radius: 8px;
+  width: 95%;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.bumper {
+  padding-top: 1em;
 }

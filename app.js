@@ -38,11 +38,12 @@ app.get('/', function(req, res) {
     if(err) throw err;
     // Clean up the response rows into a nice usable JSON array
     var data = {cards: []};
-    for (var i = 0; i < rows.length; i++) {
+    //for (var i = 0; i < rows.length; i++) {
+    for (var i = 0; i < 10; i++) {
       var row = rows[i].name;
       //console.log("A", row);
       data.cards.push(row);
-      console.log("B", data.cards[i]);
+      //console.log("B", data.cards[i]);
     }
     // res.render goes here for synchronous execution reasons
     res.render('index', data);
