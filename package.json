@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ChrisEi/DatabasesProject#readme",
   "dependencies": {
+    "js-sha256": "^0.3.0",
     "php": "0.0.1",
     "php-express": "0.0.3",
     "pug": "^2.0.0-alpha6"

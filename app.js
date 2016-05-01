@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var path = require('path');
 var mysql = require('mysql');
+var sha256 = require('js-sha256');
 
 
 
@@ -53,7 +54,7 @@ app.get('/', function(req, res) {
     // res.render goes here for synchronous execution reasons
     //res.render('index', data);
     res.render('index');
-  });
+  //});
 });
 
 app.get('/search_:search\(*+\)', function(req, res) {
@@ -102,6 +103,10 @@ app.get('/search_:search\(*+\)', function(req, res) {
   });
 });
 
+app.get('/signup:sign\(*+\)', function(req, res) {
+  res.render('signUp');
+});
+
 app.get('/profile', function(req, res) {
   res.sendFile(__dirname + '/public/profile.html')
 //  handle_database(req,res);
@@ -111,10 +116,12 @@ app.get('/decks', function(req, res) {
   res.sendFile(__dirname + '/public/decks.html')
 //  handle_database(req,res);
 });
+
 app.get('/trade', function(req, res) {
   res.sendFile(__dirname + '/public/trades.html')
 //  handle_database(req,res);
 });
+
 app.get('/:id\([0-9]+\)', function(req, res) {
   var data = {key: "Ayyy lmao"}
   //console.log(Object.keys(req));
