@@ -34,30 +34,24 @@ html(lang='en')
             a(href='/decks') Browse Decks
           li
             a(href='/trade') Manage Cards
-    // Search box component
-    //.container
-      .row
-        .well.m_well.text-center.col-sm-offset-2.col-sm-8
-          form.form(role='form').action='submit'
-            .form-group
-              label.control-label.col-md-2(for='search') Search Cards:
-              .col-md-9
-                input#searchInput.form-control(type='search', placeholder='search')
-              .col-md-1
-                button(class="btn", data-action='search' ).btn.btn-primary#search Go!
+        ul.nav.navbar-nav.navbar-right
+          li
+            a(href='/signin') Sign In
+          li
+            a(href='/signout') Sign Out
+
     // Search box component
     .container
       .row
         p #{inString}
         .well.m_well.text-center.col-sm-offset-2.col-sm-8
-          //form
-            .form-group
           label.control-label.col-md-2(for='text') Search Cards:
           .row
             .col-md-8
               input#textInput.form-control(type='text', placeholder='search')
             .col-md-1
               button(class="btn")#myBtn.btn.btn-primary Go!
+          // Results list
           .row
             .col-md-12
               ul.cardBumper

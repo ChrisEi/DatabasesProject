@@ -7,6 +7,7 @@ var con = mysql.createConnection({
   user: "root",
   password: "pass",
   database : 'magic'
+  //charset: 'utf8_general_ci'
 });
 
 con.connect(function(err){
@@ -20,7 +21,8 @@ con.connect(function(err){
 var sets = require('./AllSets');
 var allSetNames = Object.keys(sets);
 var allCardKeys = []
-
+var count = 0;
+console.log("Buckle up, this is gonna take a while...");
 // Parse AllSets
 for (var i = 0; i < allSetNames.length; i++) {
   // Parse the set data
@@ -50,7 +52,7 @@ for (var i = 0; i < allSetNames.length; i++) {
     if (value.cards[j].rarity) {
       rare = value.cards[j].rarity;
     }
-    //console.log(rare);
+    //console.log(rare.length);
     var cmcost = null;
     if (value.cards[j].cmc) {
       cmcost = value.cards[j].cmc;
@@ -68,12 +70,12 @@ for (var i = 0; i < allSetNames.length; i++) {
     //console.log(ty);
     var text = null;
     if (value.cards[j].text) {
-      text = value.cards[j].text;
+      text = String(value.cards[j].text);
     }
     //console.log(text);
     var flav = null;
     if (value.cards[j].flavor) {
-      flav = value.cards[j].flavor;
+      flav = String(value.cards[j].flavor);
     }
     //console.log(flav);
     var p = null;
@@ -111,7 +113,20 @@ for (var i = 0; i < allSetNames.length; i++) {
     con.query('INSERT INTO mtgcard SET ?', card, function(err,res){
       if(err) throw err;
       // and alert the console on progress
-      console.log('Last insert ID:', res.insertId);
+      var progress = "\r";
+      // Progress bar!
+      //console.log('Last insert ID:', res.insertId);
+      if (res.insertId % 500 == 0) {
+        count = count + 1;
+        progress = progress + "Progress: [";
+        for (var j = 0; j < count; j++) {
+          progress = progress + "\u2588";
+        }
+        for (var j = 0; j < 60 - count; j++) {
+          progress = progress + " ";
+        }
+        process.stdout.write(progress + "] " + (count/60).toFixed(2) +"%");
+      }
     });
   }
 }

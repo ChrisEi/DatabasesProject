@@ -4,28 +4,28 @@ USE magic;
 
 CREATE TABLE mtgcard (
   id INTEGER(12) NOT NULL AUTO_INCREMENT,
-  name VARCHAR(32),
-  manaCost VARCHAR(12),
-  cmc FLOAT(2,1),
-  type VARCHAR(32),
+  name VARCHAR(200),
+  manaCost VARCHAR(64),
+  cmc FLOAT(16,1),
+  type VARCHAR(64),
   rarity VARCHAR(16),
-  cardText VARCHAR(256),
-  flavor VARCHAR(256),
-  setNumber VARCHAR(4),
-  setName VARCHAR(32),
-  power INTEGER(2),
-  toughness INTEGER(2),
+  cardText TEXT(512) CHARSET utf8mb4,
+  flavor TEXT(512) CHARSET utf8mb4,
+  setNumber VARCHAR(8) CHARSET utf8mb4,
+  setName VARCHAR(64) CHARSET utf8mb4,
+  power VARCHAR(4),
+  toughness VARCHAR(4),
   hand VARCHAR(4),
   life VARCHAR(4),
   releaseDate VARCHAR(10),
-  setCode VARCHAR(5),
+  setCode VARCHAR(10),
   PRIMARY KEY (id)
 );
 
 CREATE TABLE deck (
   deck_id INTEGER(12) NOT NULL AUTO_INCREMENT,
   deck_name VARCHAR(32) NOT NULL,
-  desc VARCHAR(128),
+  deck_desc VARCHAR(128),
   PRIMARY KEY (deck_id)
 );
 
@@ -39,8 +39,8 @@ CREATE TABLE deck_card (
 
 CREATE TABLE user (
   user_id INTEGER(16) NOT NULL AUTO_INCREMENT,
-  password VARCHAR(32) NOT NULL,
-  key VARCHAR(32),
+  password VARCHAR(64) NOT NULL,
+  loginKey VARCHAR(64),
   PRIMARY KEY (user_id)
 );
 

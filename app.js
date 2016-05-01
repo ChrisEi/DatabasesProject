@@ -3,11 +3,13 @@ var app = express();
 var path = require('path');
 var mysql = require('mysql');
 var sha256 = require('js-sha256');
+var cookieParser = require('cookie-parser');
 
 
 
 // Allow express to send static files from the public directory
 app.use(express.static(__dirname + '/public'));
+app.use(cookieParser());
 app.set('views', './views');
 app.set('view engine', 'pug');
 
@@ -103,14 +105,143 @@ app.get('/search_:search\(*+\)', function(req, res) {
   });
 });
 
+// This would only be secure if the site were https (I think), but works for now
 app.get('/signup:sign\(*+\)', function(req, res) {
-  res.render('signUp');
+  var userinfo = req.url.slice(8);
+  if (userinfo) {
+    userinfo = userinfo.split('_');
+    var u_id = "";
+    var uname = userinfo[0];
+    var shapass = sha256(userinfo[1]);
+    var shaloginKey = sha256(String(Date()) + shapass);
+    var sqlObj = {password: shapass, loginKey: shaloginKey};
+    // Insert the password and login key to the database
+    function insert1() {
+      console.log("Inserting pass, loginKey for", uname);
+      var in1object = {password: shapass, loginKey: shaloginKey};
+      con.query('INSERT INTO user SET ?', in1object), function(err, rows){
+        if(err) throw err;
+        if(!err) {
+          select1();
+        }
+      }
+    }
+    // Grab the auto incremented user_id from the database
+    function select1() {
+      console.log("Selecting user_id for", uname);
+      con.query('SELECT * FROM user WHERE password = "'+"ayy"+'"'), function(err, rows){
+        if(err) throw err;
+        console.log(Object.keys(rows));
+        u_id = rows[0].user_id;
+        renderNext();
+      }
+    }
+    function insert2() {
+      // Insert user_id and username into profile table
+      console.log("Inserting user_id, username for", uname);
+      var instring = 'INSERT INTO profile (user_id, username) VALUES ('+u_id+', "'+uname+'")'
+      console.log(instring);
+      con.query(instring), function(err, rows){
+        if(err) throw err;
+        res.redirect('/profile');
+      }
+    }
+    // Fire function chain
+    insert1();
+  }
+  else {
+    userinfo = "";
+    var data =  {cleaned: userinfo};
+    renderNext();
+  }
+  function renderNext() {
+    res.render('signUp', data);
+  }
 });
 
+
+
+app.get('/signin:sign\(*+\)', function(req, res) {
+  // Grab login form data
+  var userinfo = req.url.slice(8);
+  var user = "";
+  var shapass = "";
+  var warning = {alert: "none"};
+  if (userinfo) {
+    userinfo = userinfo.split('_');
+    user = userinfo[0];
+    shapass = userinfo[1];
+  } else {
+    userinfo = "";
+  }
+  // Verify against the database
+  var userList = {id: [], pass: [], name: []}
+  con.query('SELECT user.user_id, password, username FROM user INNER JOIN profile ON user.user_id = profile.user_id;', function(err, rows){
+    if(err) throw err;
+    // Clean up the response rows into a nice usable JSON object
+    for (var i = 0; i < rows.length; i++) {
+      var u_id = rows[i].user_id;
+      var pass = rows[i].password;
+      var uname = rows[i].username;
+      userList.id.push(u_id);
+      userList.pass.push(pass);
+      userList.name.push(uname);
+    }
+    if (userinfo !== "") {
+      for (var j = 0; j < userList.length; j++) {
+        if (user == userList.name) {
+          if (shapass == userList.pass) {
+            warning.alert = "ok";
+          }
+        }
+      }
+      if (warning.alert != "ok") {
+        warning.alert = "fail";
+      }
+    }
+    //console.log(userList);
+    res.render('signIn', warning);
+  });
+});
+
+
+
+app.get('/signout', function(req, res) {
+  var cookie = req.cookies.userName;
+  if (cookie !== undefined)
+  {
+    // no: set a new cookie
+    var randomNumber=Math.random().toString();
+    res.clearCookie('userName');
+    console.log('cookie erased successfully');
+  }
+  else {
+    console.log('No cookie to erase');
+  }
+  res.render('signOut');
+});
+
+
+
 app.get('/profile', function(req, res) {
-  res.sendFile(__dirname + '/public/profile.html')
+  var cookie = req.cookies.userName;
+  if (cookie === undefined)
+  {
+    // no: set a new cookie
+    var randomNumber=Math.random().toString();
+    res.cookie('userName', "Bob", { maxAge: 900000, httpOnly: true });
+    console.log('cookie created successfully');
+  }
+  else
+  {
+    // yes, cookie was already present
+    console.log('cookie exists', cookie);
+  }
+  res.render('profile')
 //  handle_database(req,res);
 });
+
+
 
 app.get('/decks', function(req, res) {
   res.sendFile(__dirname + '/public/decks.html')

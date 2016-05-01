@@ -35,6 +35,11 @@ html(lang='en')
             a(href='/decks') Browse Decks
           li.active
             a(href='/trade') Card Manager
+        ul.nav.navbar-nav.navbar-right
+          li
+            a(href='/signin') Sign In
+          li
+            a(href='/signout') Sign Out
     // Sign up 'form'
     .container
       .row
@@ -48,10 +53,28 @@ html(lang='en')
           input#pass1.form-control(type='password', placeholder='').Bumper
           label.control-label(for='text').Bumper Repeat Password:
           input#pass2.form-control(type='password', placeholder='').Bumper
-          button.btn.btn-success Submit
-      // closing container
-    // closing searchbar row
-    // closing main container div
+          button.btn.btn-success#verify Submit
+    // Submit button javascript
+    script(type='text/javascript').
+      document.getElementById('verify').addEventListener("click", function() {
+        var uname = document.getElementById('username').value;
+        var pass1 = document.getElementById('pass1').value;
+        var pass2 = document.getElementById('pass2').value;
+        if (uname == "") {
+          alert('Missing a username!');
+          return;
+        }
+        if (pass1 == "" || pass2 == "") {
+          alert('Missing a password!');
+          return;
+        }
+        if (pass1 != pass2) {
+          alert('Your passwords don\'t match!');
+          return;
+        }
+        window.location.assign('http://localhost:9001/signup' + '_' + uname + '_' + pass1);
+        return false;
+      });
     // jQuery (necessary for Bootstrap's JavaScript plugins)
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js')
     // Include all compiled plugins (below), or include individual files as needed

@@ -7,10 +7,10 @@ html(lang='en')
     // The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
     title Databases Project
     // Bootstrap
-    link(href='css/bootstrap.min.css', rel='stylesheet')
+    link(href='/css/bootstrap.min.css', rel='stylesheet')
     link(href='css/main.css', rel='stylesheet')
     // my stylesheet
-    link(href='css/main.css', rel='stylesheet')
+    link(href='/css/main.css', rel='stylesheet')
     // fonts
     link(href='https://fonts.googleapis.com/css?family=Source+Code+Pro:600', rel='stylesheet', type='text/css')
     // HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
@@ -20,20 +20,21 @@ html(lang='en')
       script(src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js')
 
   body.m_bg
+    // this is where my code starts!
     // navbar component
     nav.navbar.navbar-inverse.fontset
       .container-fluid
         .navbar-header
           a.navbar-brand(href='/') Databases
         ul.nav.navbar-nav
-          li.active
+          li
             a(href='/') Home
           li
             a(href='/profile') Profile
           li
             a(href='/decks') Browse Decks
-          li
-            a(href='/trade') Manage Cards
+          li.active
+            a(href='/trade') Card Manager
         ul.nav.navbar-nav.navbar-right
           li
             a(href='/signin') Sign In
@@ -43,23 +44,16 @@ html(lang='en')
     .container
       .row
         .well.m_well.text-center.col-sm-offset-2.col-sm-8
-          //form
-            .form-group
-          label.control-label.col-md-2(for='text') Search Cards:
-          .col-md-9
-            input#textInput.form-control(type='text', placeholder='search')
-          .col-md-1
-            button(class="btn")#myBtn.btn.btn-primary Go!
+          .h2 You've been signed out! Bye!
+          p (Redirecting after 3 seconds)
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function () {
+          window.location.href = "/"; //will redirect to your blog page (an ex: blog.html)
+        }, 3000); //will call the function after 2 secs.
+      }, false);
 
-
-    // Search JavaScript
-    script(type='text/javascript').
-      document.getElementById('myBtn').addEventListener("click", function() {
-        var textIn = document.getElementById('textInput').value;
-        window.location.assign('http://localhost:9001/search_' + textIn);
-        return false;
-      });
     // jQuery (necessary for Bootstrap's JavaScript plugins)
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js')
     // Include all compiled plugins (below), or include individual files as needed
-    script(src='js/bootstrap.min.js')
+    script(src='/js/bootstrap.min.js')
