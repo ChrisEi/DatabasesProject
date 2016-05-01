@@ -48,15 +48,23 @@ html(lang='en')
     // Search box component
     .container
       .row
+        p #{inString}
         .well.m_well.text-center.col-sm-offset-2.col-sm-8
           //form
             .form-group
           label.control-label.col-md-2(for='text') Search Cards:
-          .col-md-9
-            input#textInput.form-control(type='text', placeholder='search')
-          .col-md-1
-            button(class="btn")#myBtn.btn.btn-primary Go!
-
+          .row
+            .col-md-8
+              input#textInput.form-control(type='text', placeholder='search')
+            .col-md-1
+              button(class="btn")#myBtn.btn.btn-primary Go!
+          .row
+            .col-md-12
+              ul.cardBumper
+                each n, i in name
+                  li
+                    a(href='/' + id[i])
+                      .well.list-well #{n}
 
     // Search JavaScript
     script(type='text/javascript').

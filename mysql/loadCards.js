@@ -102,14 +102,15 @@ for (var i = 0; i < allSetNames.length; i++) {
     }
     //console.log(rDate);
 
-
+    // card is a model object for inserting rows into sql
     var card = { name: n, manaCost: mC, power: p, toughness: t, cmc: cmcost,
                  type: ty, flavor: flav, rarity: rare, cardText: text,
                  setNumber: set_Num, setName: set_Name, hand: handCost, life: lifeVal,
                  releaseDate: rDate, setCode: set_Code};
+    // Here we insert the row
     con.query('INSERT INTO mtgcard SET ?', card, function(err,res){
       if(err) throw err;
-
+      // and alert the console on progress
       console.log('Last insert ID:', res.insertId);
     });
   }
@@ -120,29 +121,3 @@ con.end(function(err) {
   // Ensures all previously enqueued queries are still
   // before sending a COM_QUIT packet to the MySQL server.
 });
-
-
-
-// AllCards.json code:
-
-//var cards = require('./AllCards');
-//var allCardNames = Object.keys(cards);
-//var allCardKeys = []
-/*
-// Parse AllCards
-for (var i = 0; i < allCardNames.length; i++) {
-  var name = allCardNames[i];
-  var value = cards[name];
-  var keys = Object.keys(value);
-  if (value.mciNumber) {
-    //console.log(value.printings)
-  }
-  for (var j in keys) {
-    if (allCardKeys.indexOf(keys[j]) < 0) {
-      allCardKeys.push(keys[j]);
-    }
-  }
-}
-// output list of card keys
-//console.log(allCardKeys);
-*/

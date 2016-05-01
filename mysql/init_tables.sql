@@ -22,14 +22,36 @@ CREATE TABLE mtgcard (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE deck (
+  deck_id INTEGER(12) NOT NULL AUTO_INCREMENT,
+  deck_name VARCHAR(32),
+  desc VARCHAR(128),
+  PRIMARY KEY (deck_id)
+);
+
 CREATE TABLE user (
-  user_id VARCHAR(32) NOT NULL,
+  user_id INTEGER(16) NOT NULL AUTO_INCREMENT,
   password VARCHAR(32),
   PRIMARY KEY (user_id)
 );
 
+CREATE TABLE userName (
+  user_id INTEGER(16) NOT NULL AUTO_INCREMENT,
+  first VARCHAR(16),
+  last VARCHAR(16),
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id)
+);
+
+CREATE TABLE userPhone (
+  user_id INTEGER(16) NOT NULL AUTO_INCREMENT,
+  phone INTEGER(10),
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id)
+);
+
 CREATE TABLE userAddress (
-  user_id VARCHAR(32) NOT NULL,
+  user_id INTEGER(16) NOT NULL AUTO_INCREMENT,
   street VARCHAR(32),
   city VARCHAR(32),
   state VARCHAR(32),
@@ -37,3 +59,30 @@ CREATE TABLE userAddress (
   FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
   PRIMARY KEY (user_id)
 );
+
+CREATE TABLE profile (
+  user_id INTEGER(16) NOT NULL AUTO_INCREMENT,
+  bio VARCHAR(256),
+  username VARCHAR(16),
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id)
+);
+
+CREATE TABLE profileFriends (
+  user_id INTEGER(16) NOT NULL AUTO_INCREMENT,
+  friend_id INTEGER(16),
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id)
+);
+
+CREATE TABLE trade (
+  user_id INTEGER(16) NOT NULL AUTO_INCREMENT,
+  price FLOAT(2,2),
+  card_name VARCHAR(32),
+  card_num INTEGER(6),
+  num_cards INTEGER(3),
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (card_num) REFERENCES mtgcard(id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id, card_num)
+);
+
