@@ -306,7 +306,7 @@ app.get('/profile', function(req, res) {
     cookieui = "";
   }
   // JSON to store results
-  var userList = {id: "", pass: "", name: "", bio: ""}
+  var userList = {id: "", name: "", bio: "", friends: [], friendsid: []}
   function query1() {
     var qString = "";
     qString = qString + 'SELECT user.user_id, password, username, bio ';
@@ -324,7 +324,28 @@ app.get('/profile', function(req, res) {
         userList.pass = rows[0].password;
         userList.name = rows[0].username;
         userList.bio = rows[0].bio;
-        console.log(userList);
+        //console.log(userList);
+      }
+      //res.render('profile', userList);
+      query2();
+    });
+  }
+  function query2() {
+    var qString = "";
+    qString = qString + 'SELECT profileFriends.friend_id, profile.username ';
+    qString = qString + 'FROM profile INNER JOIN profileFriends ON ';
+    qString = qString + 'profile.user_id = profileFriends.friend_id ';
+    qString = qString + 'WHERE profileFriends.user_id = "' + cookieui +'";';
+    // Test query using string on mysql
+    //console.log(qString);
+    // Make query
+    con.query(qString, function(err, rows){
+      if(err) throw err;
+      // Clean up the response rows into a nice usable JSON object
+      for (var k = 0; k < rows.length; k++) {
+        userList.friendsid.push(rows[k].friend_id);
+        userList.friends.push(rows[k].username);
+        console.log(userList.friendsid, userList.friends);
       }
       res.render('profile', userList);
     });
@@ -370,7 +391,7 @@ app.get('/editprofile\(*+\)', function(req, res) {
       con.query('INSERT INTO userName SET ?', obj_insert, function(err, rows){
         if(err) {
           obj_insert = {first: fn, last: ln};
-          con.query('UPDATE userName SET ?', obj_insert, function(err, rows){
+          con.query('UPDATE userName SET ? WHERE user_id="'+u_id+'"', obj_insert, function(err, rows){
             if(err) throw err;
           });
         }
@@ -384,7 +405,7 @@ app.get('/editprofile\(*+\)', function(req, res) {
       con.query('INSERT INTO userPhone SET ?', obj_insert, function(err, rows){
         if(err) {
           obj_insert = {phone: ph};
-          con.query('UPDATE userPhone SET ?', obj_insert, function(err, rows){
+          con.query('UPDATE userPhone SET ? WHERE user_id="'+u_id+'"', obj_insert, function(err, rows){
             if(err) throw err;
           });
         }
@@ -398,7 +419,7 @@ app.get('/editprofile\(*+\)', function(req, res) {
       con.query('INSERT INTO userAddress SET ?', obj_insert, function(err, rows){
         if(err) {
           obj_insert = {street: str, city: ct, state: st, zip: zp};
-          con.query('UPDATE userAddress SET ?', obj_insert, function(err, rows){
+          con.query('UPDATE userAddress SET ? WHERE user_id="'+u_id+'"', obj_insert, function(err, rows){
             if(err) throw err;
           });
         }
@@ -412,7 +433,7 @@ app.get('/editprofile\(*+\)', function(req, res) {
       con.query('INSERT INTO profile SET ?', obj_insert, function(err, rows){
         if(err) {
           obj_insert = {bio: b};
-          con.query('UPDATE profile SET ?', obj_insert, function(err, rows){
+          con.query('UPDATE profile SET ? WHERE user_id="'+u_id+'"', obj_insert, function(err, rows){
             if(err) throw err;
           });
         }
@@ -435,9 +456,74 @@ app.get('/decks', function(req, res) {
 //  handle_database(req,res);
 });
 
-app.get('/trade', function(req, res) {
-  res.sendFile(__dirname + '/public/trades.html')
-//  handle_database(req,res);
+app.get('/editfriends', function(req, res) {
+  verifyLogin(req, function(result) {
+    if (result) {
+      var cookieui = req.cookies.userId;
+      var userList = {id: [], name: [], type: "friend"};
+      var qString = "";
+      qString = qString + 'SELECT profileFriends.friend_id, profile.username ';
+      qString = qString + 'FROM profile INNER JOIN profileFriends ON ';
+      qString = qString + 'profile.user_id = profileFriends.friend_id ';
+      qString = qString + 'WHERE profileFriends.user_id = "' + cookieui +'";';
+      // Test query using string on mysql
+      console.log(qString);
+      // Make query
+      con.query(qString, function(err, rows){
+        if(err) throw err;
+        // Clean up the response rows into a nice usable JSON object
+        for (var k = 0; k < rows.length; k++) {
+          userList.id.push(rows[k].friend_id);
+          userList.name.push(rows[k].username);
+          console.log(userList);
+        }
+        //res.render('profile', userList);
+        res.render('editlists', userList);
+      });
+    } else {
+      res.render('/');
+    }
+  });
+});
+
+app.get('/process_\(*\)', function(req, res) {
+  var inputs = req.url.slice(9);
+  inputs = inputs.split("_");
+  verifyLogin(req, function(result) {
+    if (result) {
+      var ui = req.cookies.userId;
+
+      if (inputs[0] == "addfriend") {
+        console.log("adding friend: ", inputs[1]);
+        obj_insert = {user_id: ui, friend_id: inputs[1]};
+        con.query('SELECT * FROM profileFriends WHERE user_id="'+ui+'" AND friend_id="'+inputs[1]+'"', function(err, rows){
+          if(err) throw err;
+          if (rows.length == 0) {
+            con.query('INSERT INTO profileFriends SET ?', obj_insert, function(err, rows){
+              if(err) throw err;
+              gonext();
+            });
+          } else {
+            gonext();
+          }
+        });
+        function gonext() {
+          res.redirect('/')
+        }
+      }
+
+      if (inputs[0] == "rmfriend") {
+        console.log("removing friend: ", inputs[1]);
+        obj_insert = {user_id: ui, friend_id: inputs[1]};
+        con.query('DELETE FROM profileFriends WHERE user_id="'+ui+'" AND friend_id="'+inputs[1]+'"', function(err, rows){
+          if(err) throw err;
+          res.redirect(inputs[2]);
+        });
+      }
+    } else {
+      res.redirect('signIn');
+    }
+  });
 });
 
 app.get('/:id\([0-9]+\)', function(req, res) {
@@ -556,7 +642,6 @@ app.get('/:id\([0-9]+\)', function(req, res) {
 });
 
 app.get('/:id\(u[0-9]+\)', function(req, res) {
-  var data = {key: "Ayyy lmao"}
   //console.log(Object.keys(req));
   var userNumber = req.url.slice(2);
   console.log("Fetching user profile: ", userNumber);
@@ -573,6 +658,7 @@ app.get('/:id\(u[0-9]+\)', function(req, res) {
     // Get the unique ID
     data.name = rows[0].username;
     data.bio = rows[0].bio;
+    data.id = rows[0].user_id;
 
     // Render page!
     res.render('otherprofile', data);
@@ -580,6 +666,5 @@ app.get('/:id\(u[0-9]+\)', function(req, res) {
 });
 
 // Start server
-app.listen(9001, function() {
-  console.log('Server listening on port 9001!');
-});
+//app.listen(9001, function() { console.log('Server listening on port 9001!'); });
+app.listen(9000, function() { console.log('Test Server!'); });

@@ -47,15 +47,18 @@ html(lang='en')
       // closing user info row
       .row
         .well.m_well.text-center.col-sm-offset-2.col-sm-3
-          h2 My Friends
+          h2 #{name}'s Friends
+          p
+            button(class="btn")#add.btn.btn-primary Add Friend!
           p No Friends!
         .well.m_well.text-center.col-sm-offset-1.col-sm-4
-          h2 My Decks
-          p No Decks!
+          h2 #{name}'s Deck
+          p No Deck!
 
     script(type='text/javascript').
-      document.getElementById('editp').addEventListener("click", function() {
-        window.location.assign('/editprofile');
+      document.getElementById('add').addEventListener("click", function() {
+        window.location.assign('/process_addfriend_' + #{id});
+        //window.location.assign('/editprofile');
       });
 
     // closing main container div

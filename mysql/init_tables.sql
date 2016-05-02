@@ -80,8 +80,7 @@ CREATE TABLE profile (
 CREATE TABLE profileFriends (
   user_id INTEGER(16) NOT NULL,
   friend_id INTEGER(16),
-  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
-  PRIMARY KEY (user_id)
+  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE trade (
