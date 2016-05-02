@@ -18,7 +18,6 @@ html(lang='en')
     //if lt IE 9
       script(src='https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js')
       script(src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js')
-
   body.m_bg
     // this is where my code starts!
     // navbar component
@@ -29,26 +28,37 @@ html(lang='en')
         ul.nav.navbar-nav
           li
             a(href='/') Home
-          li
+          li.active
             a(href='/profile') Profile
         ul.nav.navbar-nav.navbar-right
           li
             a(href='/signin') Sign In
           li
             a(href='/signout') Sign Out
-
     .container
       .row
         .well.m_well.text-center.col-sm-offset-2.col-sm-8
-          .h2 You've been signed out! Bye!
-          p (Redirecting after 3 seconds)
-    script.
-      document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function () {
-          window.location.href = "/"; //will redirect to your blog page (an ex: blog.html)
-        }, 3000); //will call the function after 2 secs.
-      }, false);
+          h2 #{name}
+          if bio
+            p #{bio}
+          else if !bio
+            p No Bio Set!
 
+      // closing user info row
+      .row
+        .well.m_well.text-center.col-sm-offset-2.col-sm-3
+          h2 My Friends
+          p No Friends!
+        .well.m_well.text-center.col-sm-offset-1.col-sm-4
+          h2 My Decks
+          p No Decks!
+
+    script(type='text/javascript').
+      document.getElementById('editp').addEventListener("click", function() {
+        window.location.assign('/editprofile');
+      });
+
+    // closing main container div
     // jQuery (necessary for Bootstrap's JavaScript plugins)
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js')
     // Include all compiled plugins (below), or include individual files as needed

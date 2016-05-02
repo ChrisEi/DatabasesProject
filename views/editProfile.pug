@@ -43,32 +43,55 @@ html(lang='en')
           .h2 Sign Up for MTG Card Manager!
       .row
         .well.m_well.text-center.col-sm-offset-2.col-sm-8
-          label.control-label(for='text').Bumper Username:
-          input#username.form-control(type='text', placeholder='').Bumper
-          label.control-label(for='text').Bumper Password:
-          input#pass1.form-control(type='password', placeholder='').Bumper
-          label.control-label(for='text').Bumper Repeat Password:
-          input#pass2.form-control(type='password', placeholder='').Bumper
+          label.control-label(for='text').Bumper First Name:
+          input#firstname.form-control(type='text', placeholder='' maxlength=15).Bumper
+          label.control-label(for='text').Bumper Last Name:
+          input#lastname.form-control(type='text', placeholder='' maxlength=15).Bumper
+          label.control-label(for='text').Bumper Bio:
+          textarea#bio.form-control(placeholder='' maxlength=250 rows=2).Bumper
+          label.control-label(for='text').Bumper Phone:
+          input#phone.form-control(type='tel', placeholder='' maxlength=10).Bumper
+          label.control-label(for='text').Bumper Street:
+          input#street.form-control(type='text', placeholder='' maxlength=32).Bumper
+          label.control-label(for='text').Bumper City:
+          input#city.form-control(type='text', placeholder='' maxlength=32).Bumper
+          label.control-label(for='text').Bumper State:
+          input#state.form-control(type='text', placeholder='' maxlength=32).Bumper
+          label.control-label(for='text').Bumper Zip:
+          input#zip.form-control(type='text', placeholder='' maxlength=5).Bumper
           button.btn.btn-success#verify Submit
     // Submit button javascript
     script(type='text/javascript').
       document.getElementById('verify').addEventListener("click", function() {
-        var uname = document.getElementById('username').value;
-        var pass1 = document.getElementById('pass1').value;
-        var pass2 = document.getElementById('pass2').value;
-        if (uname == "") {
-          alert('Missing a username!');
+        var fname = document.getElementById('firstname').value;
+        var lname = document.getElementById('lastname').value;
+        var b = document.getElementById('bio').value;
+        var ph = document.getElementById('phone').value;
+        var str = document.getElementById('street').value;
+        var ct = document.getElementById('city').value;
+        var st = document.getElementById('state').value;
+        var zp = document.getElementById('zip').value;
+        if (fname == "") {
+          alert('Missing a first name!');
           return;
         }
-        if (pass1 == "" || pass2 == "") {
-          alert('Missing a password!');
+        if (lname == "") {
+          alert('Missing a last name!');
           return;
         }
-        if (pass1 != pass2) {
-          alert('Your passwords don\'t match!');
+        if (bio == "") {
+          alert('Missing a bio!');
           return;
         }
-        window.location.assign('/signup' + '_' + uname + '_' + pass1);
+        if (ph == "") {
+          alert('Missing a phone number!');
+          return;
+        }
+        if (str == "" || st == "" || ct == "" || zp == "") {
+          alert('Address incomplete!');
+          return;
+        }
+        window.location.assign('/editprofile' + '_' + fname + '_' + lname + '_' + b + '_' + ph + '_' + str + '_' + ct + '_' + st + '_' + zp);
         return false;
       });
     // jQuery (necessary for Bootstrap's JavaScript plugins)

@@ -35,119 +35,172 @@ con.connect(function(err){
 
 // Establish get routes to the public files via url bar
 app.get('/', function(req, res) {
-  // This was going to be a react updated search, but time constraints.
-  /*var data = {name: [], id: [], setCode: [], setNum: []};
-  con.query('SELECT name, id, setCode, setNumber FROM mtgcard', function(err, rows){
-    if(err) throw err;
-    // Clean up the response rows into a nice usable JSON object
-    //for (var i = 0; i < rows.length; i++) { *shortened to ten results
-    for (var i = 0; i < 10; i++) {
-      var n = rows[i].name;
-      var ident = rows[i].id;
-      var sC = rows[i].setCode;
-      var sN = rows[i].setNumber;
-      data.name.push(n);
-      data.id.push(ident);
-      data.setCode.push(sC);
-      data.setNum.push(sN);
-      //console.log(data[i]);
-    }
-    */
-    // res.render goes here for synchronous execution reasons
-    //res.render('index', data);
-    res.render('index');
-  //});
+    res.render('advancedSearch');
 });
 
 app.get('/search_:search\(*+\)', function(req, res) {
   // Database query using the url's trailing regular expression
   var searchString = req.url.slice(8);
-  searchString = searchString.split('%20');
-  var queryString = 'SELECT name, id, setCode, setNumber FROM mtgcard ';
-  if (searchString.length > 0) {
-    queryString = queryString + 'WHERE name LIKE "' + searchString[0] + '%" ';
-  }
-  for (var i = 1; i < searchString.length; i++) {
-    queryString = queryString + 'OR name LIKE "' + searchString[i] + '%" ';
-  }
-  // Log the query, for science
-  console.log(queryString);
-  // Here's our data's JSON container
-  var data = {name: [], id: [], setCode: [], setNum: []};
-  con.query(queryString, function(err, rows){
-    if(err) throw err;
-    // Clean up the response rows into a nice usable JSON object
-    for (var i = 0; i < rows.length; i++) {
-      var skip = false;
-      for (var k = 0; k < data.name.length; k++) {
-        // Gotta clean the duplicates from the data
-        // Duplicates stem from the same card being released in multiple sets
-        if (data.name[k] == rows[i].name) {
-          skip = true;
-          k = data.length;
-        }
-      }
-      if (skip) {
-        continue;
-      }
-      var n = rows[i].name;
-      var ident = rows[i].id;
-      var sC = rows[i].setCode;
-      var sN = rows[i].setNumber;
-      data.name.push(n);
-      data.id.push(ident);
-      data.setCode.push(sC); // setCode, setNumber is for getting an image
-      data.setNum.push(sN);  // to display by the name, not yet implemented
-      //console.log(data[i]);
+  searchString = searchString.split('_');
+  console.log(searchString);
+  if (searchString[0] == "cards") {
+    var queryString = 'SELECT name, id, setCode, setNumber FROM mtgcard ';
+    if (searchString.length > 0) {
+      queryString = queryString + 'WHERE name LIKE "' + searchString[1] + '%" ';
     }
-    // res.render goes here for synchronous execution reasons
-    res.render('results', data);
-  });
+    for (var i = 2; i < searchString.length; i++) {
+      queryString = queryString + 'OR name LIKE "' + searchString[i] + '%" ';
+    }
+    // Log the query, for science
+    console.log(queryString);
+    // Here's our data's JSON container
+    var data = {name: [], id: [], setCode: [], setNum: [], flag: ""};
+    con.query(queryString, function(err, rows){
+      if(err) throw err;
+      // Clean up the response rows into a nice usable JSON object
+      for (var i = 0; i < rows.length; i++) {
+        var skip = false;
+        for (var k = 0; k < data.name.length; k++) {
+          // Gotta clean the duplicates from the data
+          // Duplicates stem from the same card being released in multiple sets
+          if (data.name[k] == rows[i].name) {
+            skip = true;
+            k = data.length;
+          }
+        }
+        if (skip) {
+          continue;
+        }
+        var n = rows[i].name;
+        var ident = rows[i].id;
+        var sC = rows[i].setCode;
+        var sN = rows[i].setNumber;
+        data.name.push(n);
+        data.id.push(ident);
+        data.setCode.push(sC); // setCode, setNumber is for getting an image
+        data.setNum.push(sN);  // to display by the name, not yet implemented
+        //console.log(data[i]);
+      }
+      // res.render goes here for synchronous execution reasons
+      res.render('results', data);
+    });
+  }
+
+  if (searchString[0] == "users") {
+    var queryString = 'SELECT user.user_id, username FROM user INNER JOIN profile ON user.user_id = profile.user_id ';
+    if (searchString.length > 0) {
+      queryString = queryString + 'WHERE username LIKE "' + searchString[1] + '%" ';
+    }
+    for (var i = 2; i < searchString.length; i++) {
+      queryString = queryString + 'OR username LIKE "' + searchString[i] + '%" ';
+    }
+    // Log the query, for science
+    console.log(queryString);
+    // Here's our data's JSON container
+    var data = {name: [], id: [], flag: "u"};
+    con.query(queryString, function(err, rows){
+      if(err) throw err;
+      // Clean up the response rows into a nice usable JSON object
+      for (var i = 0; i < rows.length; i++) {
+        var skip = false;
+        for (var k = 0; k < data.name.length; k++) {
+          // Gotta clean the duplicates from the data
+          // Duplicates stem from the same card being released in multiple sets
+          if (data.name[k] == rows[i].username) {
+            skip = true;
+            k = data.length;
+          }
+        }
+        if (skip) {
+          continue;
+        }
+        var n = rows[i].username;
+        var ident = rows[i].user_id;
+        data.name.push(n);
+        data.id.push(ident);
+        //console.log(data[i]);
+      }
+      // res.render goes here for synchronous execution reasons
+      res.render('results', data);
+    });
+  }
 });
 
+// create cookie based on username, loginkey
+function createCookie(ui, lk, res, req) {
+  // Create cookies
+  res.cookie('userId', ui, { maxAge: 3600000, httpOnly: true, path: '/' });
+  res.cookie('login', lk, { maxAge: 3600000, httpOnly: true, path: '/' });
+  // Modify database login key
+  con.query('UPDATE user SET loginKey="'+lk+'" WHERE user_id="'+ui+'"', function(err, rows){
+    if(err) throw err;
+    //console.log("Updated lk!");
+  });
+  console.log('cookies created successfully for user #', ui);
+}
+
+// Verify login based on cookies
+function verifyLogin(req, cb) {
+  var cookieui = req.cookies.userId;
+  var cookielk = req.cookies.login;
+  var result;
+  console.log(cookielk, cookieui);
+  if (cookieui === undefined || cookielk === undefined)
+  {
+    // burned cookies, abort mission
+    console.log('User not signed in!');
+    result = false;
+    cb(result);
+  }
+  else {
+    con.query('SELECT * FROM user WHERE user_id = "'+cookieui+'"', function(err, rows){
+      if(err) throw err;
+      //console.log("verifying " +cookielk+ " equals "+ rows[0].loginKey);
+      if (cookielk == rows[0].loginKey) {
+        //console.log("yay");
+        result = true;
+        cb(result);
+      } else {
+        //console.log(cookielk);
+        //console.log(rows[0].loginKey);
+        result = false;
+        cb(result);
+      }
+    });
+  }
+}
 // This would only be secure if the site were https (I think), but works for now
 app.get('/signup:sign\(*+\)', function(req, res) {
   var userinfo = req.url.slice(8);
   if (userinfo) {
     userinfo = userinfo.split('_');
-    var u_id = "";
+    var u_id;
     var uname = userinfo[0];
     var shapass = sha256(userinfo[1]);
     var shaloginKey = sha256(String(Date()) + shapass);
-    var sqlObj = {password: shapass, loginKey: shaloginKey};
+    var obj_insert1 = {password: shapass, loginKey: shaloginKey};
     // Insert the password and login key to the database
-    function insert1() {
-      console.log("Inserting pass, loginKey for", uname);
-      var in1object = {password: shapass, loginKey: shaloginKey};
-      con.query('INSERT INTO user SET ?', in1object), function(err, rows){
+    con.query('INSERT INTO user SET ?', obj_insert1, function(err, rows){
+      if(err) throw err;
+      //console.log(rows);
+      queryChain2();
+    });
+    function queryChain2() {
+      con.query('SELECT * FROM user WHERE password = "'+shapass+'"', function(err, rows){
         if(err) throw err;
-        if(!err) {
-          select1();
-        }
-      }
-    }
-    // Grab the auto incremented user_id from the database
-    function select1() {
-      console.log("Selecting user_id for", uname);
-      con.query('SELECT * FROM user WHERE password = "'+"ayy"+'"'), function(err, rows){
-        if(err) throw err;
-        console.log(Object.keys(rows));
         u_id = rows[0].user_id;
-        renderNext();
-      }
+        queryChain3();
+      });
     }
-    function insert2() {
-      // Insert user_id and username into profile table
-      console.log("Inserting user_id, username for", uname);
-      var instring = 'INSERT INTO profile (user_id, username) VALUES ('+u_id+', "'+uname+'")'
-      console.log(instring);
-      con.query(instring), function(err, rows){
+    function queryChain3() {
+      var obj_insert2 = {user_id: u_id, username: uname};
+      con.query('INSERT INTO profile SET ?', obj_insert2, function(err, rows){
         if(err) throw err;
-        res.redirect('/profile');
-      }
+        console.log("User ", uname, " created!");
+        createCookie(u_id, shaloginKey, res, req);
+        accountCreated();
+      });
     }
-    // Fire function chain
-    insert1();
   }
   else {
     userinfo = "";
@@ -157,9 +210,10 @@ app.get('/signup:sign\(*+\)', function(req, res) {
   function renderNext() {
     res.render('signUp', data);
   }
+  function accountCreated() {
+    res.render('editProfile', data);
+  }
 });
-
-
 
 app.get('/signin:sign\(*+\)', function(req, res) {
   // Grab login form data
@@ -170,28 +224,34 @@ app.get('/signin:sign\(*+\)', function(req, res) {
   if (userinfo) {
     userinfo = userinfo.split('_');
     user = userinfo[0];
-    shapass = userinfo[1];
+    shapass = sha256(userinfo[1]);
   } else {
     userinfo = "";
   }
   // Verify against the database
   var userList = {id: [], pass: [], name: []}
-  con.query('SELECT user.user_id, password, username FROM user INNER JOIN profile ON user.user_id = profile.user_id;', function(err, rows){
-    if(err) throw err;
-    // Clean up the response rows into a nice usable JSON object
-    for (var i = 0; i < rows.length; i++) {
-      var u_id = rows[i].user_id;
-      var pass = rows[i].password;
-      var uname = rows[i].username;
-      userList.id.push(u_id);
-      userList.pass.push(pass);
-      userList.name.push(uname);
-    }
+  function sqlQuery() {
+    con.query('SELECT user.user_id, password, username FROM user INNER JOIN profile ON user.user_id = profile.user_id;', function(err, rows){
+      if(err) throw err;
+      // Clean up the response rows into a nice usable JSON object
+      for (var i = 0; i < rows.length; i++) {
+        var u_id = rows[i].user_id;
+        var pass = rows[i].password;
+        var uname = rows[i].username;
+        userList.id.push(u_id);
+        userList.pass.push(pass);
+        userList.name.push(uname);
+      }
+      veri();
+    });
+  }
+  function veri() {
     if (userinfo !== "") {
-      for (var j = 0; j < userList.length; j++) {
-        if (user == userList.name) {
-          if (shapass == userList.pass) {
+      for (var j = 0; j < userList.id.length; j++) {
+        if (user == userList.name[j]) {
+          if (shapass == userList.pass[j]) {
             warning.alert = "ok";
+            warning.num = j;
           }
         }
       }
@@ -199,49 +259,176 @@ app.get('/signin:sign\(*+\)', function(req, res) {
         warning.alert = "fail";
       }
     }
-    //console.log(userList);
-    res.render('signIn', warning);
-  });
+    final();
+  }
+  function final() {
+    var newurl = 'signIn';
+    if (warning.alert == "ok") {
+      var shakey = sha256(String(Date()));
+      createCookie(userList.id[warning.num], shakey, res, req);
+      newurl = 'advancedSearch';
+    }
+    //console.log('newurl is ', newurl, warning.alert);
+    res.render(newurl, warning);
+  }
+
+  // Start function chain
+  sqlQuery();
 });
 
-
-
 app.get('/signout', function(req, res) {
-  var cookie = req.cookies.userName;
-  if (cookie !== undefined)
+  var cookieid = req.cookies.userId;
+  var cookiesk = req.cookies.login;
+  console.log(cookieid, cookiesk);
+  /*
+  if (cookieid !== undefined)
   {
-    // no: set a new cookie
-    var randomNumber=Math.random().toString();
-    res.clearCookie('userName');
-    console.log('cookie erased successfully');
+    //res.clearCookie('cookieid', { path: '/' });
+    //res.cookie('cookieid', '', {expires: 1, path: '/' });
+    res.clearCookie('cookiesk', { path: '/' });
   }
-  else {
-    console.log('No cookie to erase');
+  if (cookiesk !== undefined)
+  {
+    //res.clearCookie('cookiesk', { path: '/' });
+    //res.cookie('cookiesk', '', {expires: new Date(1), path: '/' });
+    res.clearCookie('cookiesk', { path: '/' });
   }
+  */
+  res.cookie('userId', '', { maxAge: 1, httpOnly: true, path: '/' });
+  res.cookie('login', '', { maxAge: 1, httpOnly: true, path: '/' });
+  console.log('User signed out');
   res.render('signOut');
 });
 
-
-
 app.get('/profile', function(req, res) {
-  var cookie = req.cookies.userName;
-  if (cookie === undefined)
-  {
-    // no: set a new cookie
-    var randomNumber=Math.random().toString();
-    res.cookie('userName', "Bob", { maxAge: 900000, httpOnly: true });
-    console.log('cookie created successfully');
+  var cookieui = req.cookies.userId;
+  if (cookieui === undefined) {
+    cookieui = "";
   }
-  else
-  {
-    // yes, cookie was already present
-    console.log('cookie exists', cookie);
+  // JSON to store results
+  var userList = {id: "", pass: "", name: "", bio: ""}
+  function query1() {
+    var qString = "";
+    qString = qString + 'SELECT user.user_id, password, username, bio ';
+    qString = qString + 'FROM user INNER JOIN profile ON ';
+    qString = qString + 'user.user_id = profile.user_id ';
+    qString = qString + 'WHERE user.user_id = "' + cookieui +'";';
+    // Test query using string on mysql
+    console.log(qString);
+    // Make query
+    con.query(qString, function(err, rows){
+      if(err) throw err;
+      // Clean up the response rows into a nice usable JSON object
+      if(rows.length > 0) {
+        userList.id = rows[0].user_id;
+        userList.pass = rows[0].password;
+        userList.name = rows[0].username;
+        userList.bio = rows[0].bio;
+        console.log(userList);
+      }
+      res.render('profile', userList);
+    });
   }
-  res.render('profile')
-//  handle_database(req,res);
+  function veri() {
+    verifyLogin(req, function(result) {
+      console.log( "verifyLogin callback: ", result);
+      if (result) {
+        query1();
+      } else {
+        res.render('signIn', userList);
+      }
+    });
+  }
+  veri();
 });
 
-
+app.get('/editprofile\(*+\)', function(req, res) {
+  var userinfo = req.url.slice(12);
+  console.log(userinfo);
+  var fn, ln, b, ph, str, ct, zp, st, u_id;
+  // Get variables setup
+  if (userinfo) {
+    function cleanUrl() {
+      userinfo = userinfo.split('_');
+      fn = userinfo[1];
+      ln = userinfo[2];
+      b = userinfo[3];
+      b = b.split("%20").join(' ');
+      ph = userinfo[4];
+      str = userinfo[5];
+      ct = userinfo[6];
+      st = userinfo[7];
+      zp = userinfo[8];
+      u_id = req.cookies.userId;
+      console.log(ph)
+      insertName();
+    }
+    // Insert into database
+    function insertName() {
+      var obj_insert = {user_id: u_id, first: fn, last: ln};
+      console.log("name")
+      con.query('INSERT INTO userName SET ?', obj_insert, function(err, rows){
+        if(err) {
+          obj_insert = {first: fn, last: ln};
+          con.query('UPDATE userName SET ?', obj_insert, function(err, rows){
+            if(err) throw err;
+          });
+        }
+        //console.log(rows);
+        insertPhone();
+      });
+    }
+    function insertPhone() {
+      var obj_insert = {user_id: u_id, phone: ph};
+      console.log("phone")
+      con.query('INSERT INTO userPhone SET ?', obj_insert, function(err, rows){
+        if(err) {
+          obj_insert = {phone: ph};
+          con.query('UPDATE userPhone SET ?', obj_insert, function(err, rows){
+            if(err) throw err;
+          });
+        }
+        //console.log(rows);
+        insertAddress();
+      });
+    }
+    function insertAddress() {
+      var obj_insert = {user_id: u_id, street: str, city: ct, state: st, zip: zp};
+      console.log("addr")
+      con.query('INSERT INTO userAddress SET ?', obj_insert, function(err, rows){
+        if(err) {
+          obj_insert = {street: str, city: ct, state: st, zip: zp};
+          con.query('UPDATE userAddress SET ?', obj_insert, function(err, rows){
+            if(err) throw err;
+          });
+        }
+        //console.log(rows);
+        insertBio();
+      });
+    }
+    function insertBio() {
+      var obj_insert = {user_id: u_id, bio: b};
+      console.log("bio")
+      con.query('INSERT INTO profile SET ?', obj_insert, function(err, rows){
+        if(err) {
+          obj_insert = {bio: b};
+          con.query('UPDATE profile SET ?', obj_insert, function(err, rows){
+            if(err) throw err;
+          });
+        }
+        //console.log(rows);
+        renderNext();
+      });
+    }
+    function renderNext() {
+      res.render('advancedSearch');
+    }
+    // start function chain
+    cleanUrl();
+  } else {
+    res.render('editProfile');
+  }
+});
 
 app.get('/decks', function(req, res) {
   res.sendFile(__dirname + '/public/decks.html')
@@ -365,6 +552,30 @@ app.get('/:id\([0-9]+\)', function(req, res) {
 
     // Render page!
     res.render('cardView', data);
+  });
+});
+
+app.get('/:id\(u[0-9]+\)', function(req, res) {
+  var data = {key: "Ayyy lmao"}
+  //console.log(Object.keys(req));
+  var userNumber = req.url.slice(2);
+  console.log("Fetching user profile: ", userNumber);
+  var data = {};
+  var qString = "";
+  qString = qString + 'SELECT user.user_id, password, username, bio ';
+  qString = qString + 'FROM user INNER JOIN profile ON ';
+  qString = qString + 'user.user_id = profile.user_id ';
+  qString = qString + 'WHERE user.user_id = "' + userNumber +'";';
+  con.query(qString, function(err, rows){
+    if(err) throw err;
+    // Clean up the response row into a nice usable JSON object
+    console.log(rows);
+    // Get the unique ID
+    data.name = rows[0].username;
+    data.bio = rows[0].bio;
+
+    // Render page!
+    res.render('otherprofile', data);
   });
 });
 

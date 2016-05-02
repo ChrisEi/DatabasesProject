@@ -30,10 +30,6 @@ html(lang='en')
             a(href='/') Home
           li.active
             a(href='/profile') Profile
-          li
-            a(href='/decks') Browse Decks
-          li
-            a(href='/trade') Card Manager
         ul.nav.navbar-nav.navbar-right
           li
             a(href='/signin') Sign In
@@ -42,20 +38,32 @@ html(lang='en')
     .container
       .row
         .well.m_well.text-center.col-sm-offset-2.col-sm-8
-          h2 USERNAME
+          h2 #{name}
+          if bio
+            p #{bio}
+          else if !bio
+            p No Bio Set!
           p
-            | Lorem ipsum dolor sit amet, mollis erat mi risus mi feugiat, placerat
-            | cras id, convallis wisi, dui pede officia egestas morbi. Quam blandit pellentesque, porttitor nostra justo lorem rutrum molestie tellus, integer donec nibh. Nisl et donec, varius velit imperdiet, sem tristique ullamcorper non. Consectetuer urna velit ullamcorper eros, pretium ac fusce amet, vivamus vel nunc donec, nec purus massa id et, vestibulum purus libero pharetra vestibulum. Nullam tortor fringilla pellentesque aliquet pede nec, cursus tempor dui, aliquam libero et, tortor felis nulla sit a.
+            button(class="btn")#editp.btn.btn-primary Edit Profile
+
       // closing user info row
       .row
         .well.m_well.text-center.col-sm-offset-2.col-sm-3
           h2 My Friends
+          p No Friends!
           p
-            | Sit non wisi a aliquam, nisl amet ante integer dolor, luctus ultrices, tempor tortor elit malesuada eu nullam. Dui congue vestibulum mollis morbi amet. Lacus faucibus a, gravida ultricies lacus in aliquam risus erat, risus ac ornare amet ut et. Etiam maecenas malesuada, a mauris odio vel. Vestibulum consequat curabitur quo neque orci. Pulvinar lacinia enim sed sit, porttitor consectetuer nullam.
+            button(class="btn")#myBtn.btn.btn-primary Edit Friends
         .well.m_well.text-center.col-sm-offset-1.col-sm-4
           h2 My Decks
+          p No Decks!
           p
-            | Aliquam nulla cursus. A risus nonummy elementum semper, nibh urna, dolor sit ligula nunc iaculis gravida, pulvinar hendrerit id. Nonummy vestibulum quod, a scelerisque tortor, orci vitae. Suspendisse quis id, ultricies lacus architecto, bibendum taciti velit at felis ante ut. Vehicula massa, phasellus nunc justo sed nec nunc ut. Tempus convallis eget nec diam interdum ipsum, lectus enim amet porttitor lectus tempus aspernatur, felis condimentum, lorem cursus sed justo urna phasellus, et faucibus. Purus tortor, ut arcu fames, tellus velit suspendisse in enim eget, morbi mi eget. Est est mauris. Vulputate consequat sollicitudin nonummy id ut vel, pede laoreet ipsum. Aliquet pede praesent vitae habitant, dictum vitae in tristique rhoncus litora, lobortis luctus amet dolor, purus libero accumsan, porta a ante euismod dictum nunc risus. Donec pulvinar ipsum libero, nec massa in, imperdiet dolor, etiam ipsum penatibus et, dui vitae diam augue.
+            button(class="btn")#myBtn.btn.btn-primary Edit Decks
+
+    script(type='text/javascript').
+      document.getElementById('editp').addEventListener("click", function() {
+        window.location.assign('/editprofile');
+      });
+
     // closing main container div
     // jQuery (necessary for Bootstrap's JavaScript plugins)
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js')

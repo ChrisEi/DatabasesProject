@@ -54,7 +54,7 @@ CREATE TABLE userName (
 
 CREATE TABLE userPhone (
   user_id INTEGER(16) NOT NULL,
-  phone INTEGER(10),
+  phone varchar(10),
   FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
   PRIMARY KEY (user_id)
 );
@@ -64,14 +64,14 @@ CREATE TABLE userAddress (
   street VARCHAR(32),
   city VARCHAR(32),
   state VARCHAR(32),
-  zip INTEGER(5),
+  zip INTEGER(10),
   FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
   PRIMARY KEY (user_id)
 );
 
 CREATE TABLE profile (
   user_id INTEGER(16) NOT NULL,
-  bio VARCHAR(256),
+  bio TEXT(512),
   username VARCHAR(16),
   FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
   PRIMARY KEY (user_id)

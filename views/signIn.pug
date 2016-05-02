@@ -31,10 +31,6 @@ html(lang='en')
             a(href='/') Home
           li
             a(href='/profile') Profile
-          li
-            a(href='/decks') Browse Decks
-          li.active
-            a(href='/trade') Card Manager
         ul.nav.navbar-nav.navbar-right
           li
             a(href='/signin') Sign In
@@ -50,21 +46,36 @@ html(lang='en')
           label.control-label(for='text').Bumper Username:
           input#username.form-control(type='text', placeholder='').Bumper
           label.control-label(for='text').Bumper Password:
-          input#pass1.form-control(type='password', placeholder='').Bumper
-          button.btn.btn-success Sign in
+          input#pass.form-control(type='password', placeholder='').Bumper
+          button.btn.btn-success#signinbutton Sign in
       .row
         .well.m_well.text-center.col-sm-offset-2.col-sm-8
           .h4 Don't have an account?
-          button.btn.btn-primary#signinbutton Sign up
+          button.btn.btn-primary#signupbutton Sign up
       // Sign Up button javascript
       script(type='text/javascript').
-        document.getElementById('signinbutton').addEventListener("click", function() {
+        document.getElementById('signupbutton').addEventListener("click", function() {
           window.location.assign('http://localhost:9001/signup');
           return false;
         });
-      // closing container
-    // closing searchbar row
-    // closing main container div
+      // Sign In button javascript
+      script(type='text/javascript').
+        document.getElementById('signinbutton').addEventListener("click", function() {
+          var un = document.getElementById('username').value;
+          var ps = document.getElementById('pass').value;
+          if (un == "") {
+            alert('Missing a username!');
+            return;
+          }
+          if (ps == "") {
+            alert('Missing a password!');
+            return;
+          }
+          var newurl = '/signin_' + un + '_' + ps;
+          window.location.assign(newurl);
+          return false;
+        });
+
     // jQuery (necessary for Bootstrap's JavaScript plugins)
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js')
     // Include all compiled plugins (below), or include individual files as needed
