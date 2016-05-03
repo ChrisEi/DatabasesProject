@@ -41,6 +41,14 @@ html(lang='en')
       .row
         p #{inString}
         .well.m_well.text-center.col-sm-offset-2.col-sm-8
+          if type == "deck"
+            .row.Bumper
+              .well.m_well.text-center.col-sm-offset-2.col-sm-8
+                label.control-label(for='text').Bumper Deck name:
+                input#username.form-control(type='text', placeholder='' maxlength=30).Bumper
+                label.control-label(for='text').Bumper Deck desc:
+                input#pass.form-control(type='text', placeholder='' maxlength=120).Bumper
+                button.btn.btn-success#deckdeets Update
           .row
             h3 Select to Remove
             .col-md-8.text-center
@@ -53,12 +61,18 @@ html(lang='en')
                     li
                       a(href='/process_rmfriend_'+ id[i] + "_/editfriends")
                         .well.list-well #{n}
+              else if type == "deck"
+                ul(style="padding-left: 0px; padding-bottom: 0px;").cardBumper
+                  each n, i in name
+                    li
+                      a(href='/'+ id[i])
+                        .well.list-well #{n}
 
     // Search JavaScript
     script(type='text/javascript').
       document.getElementById('myBtn').addEventListener("click", function() {
         var textIn = document.getElementById('textInput').value;
-        window.location.assign('http://localhost:9001/search_' + textIn);
+        window.location.assign('/search_' + textIn);
         return false;
       });
     // jQuery (necessary for Bootstrap's JavaScript plugins)

@@ -26,6 +26,7 @@ CREATE TABLE deck (
   deck_id INTEGER(12) NOT NULL AUTO_INCREMENT,
   deck_name VARCHAR(32) NOT NULL,
   deck_desc VARCHAR(128),
+  deck_owner INTEGER(12),
   PRIMARY KEY (deck_id)
 );
 
@@ -33,8 +34,7 @@ CREATE TABLE deck_card (
   deck_id INTEGER(12) NOT NULL,
   card_num INTEGER(12) NOT NULL,
   FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE,
-  FOREIGN KEY (card_num) REFERENCES mtgcard(id) ON DELETE CASCADE,
-  PRIMARY KEY (deck_id, card_num)
+  FOREIGN KEY (card_num) REFERENCES mtgcard(id) ON DELETE CASCADE
 );
 
 CREATE TABLE user (

@@ -189,6 +189,13 @@ app.get('/signup:sign\(*+\)', function(req, res) {
       con.query('SELECT * FROM user WHERE password = "'+shapass+'"', function(err, rows){
         if(err) throw err;
         u_id = rows[0].user_id;
+
+        // Initialize the user's deck
+        var obj_insert2 = {deck_name: "Empty deck", deck_desc: "A new deck!", deck_owner: u_id};
+        con.query('INSERT INTO deck SET ?', obj_insert2, function(err, rows){
+          console.log('\n\n\nAdded a deck!', obj_insert2);
+          if(err) throw err;
+        });
         queryChain3();
       });
     }
@@ -306,7 +313,7 @@ app.get('/profile', function(req, res) {
     cookieui = "";
   }
   // JSON to store results
-  var userList = {id: "", name: "", bio: "", friends: [], friendsid: []}
+  var userList = {id: "", name: "", bio: "", friends: [], friendsid: [], dname: "", ddesc: ""};
   function query1() {
     var qString = "";
     qString = qString + 'SELECT user.user_id, password, username, bio ';
@@ -347,6 +354,22 @@ app.get('/profile', function(req, res) {
         userList.friends.push(rows[k].username);
         console.log(userList.friendsid, userList.friends);
       }
+      query3();
+    });
+  }
+  function query3() {
+    var qString = "";
+    qString = qString + 'SELECT deck_name, deck_desc ';
+    qString = qString + 'FROM deck ';
+    qString = qString + 'WHERE deck_owner = "' + cookieui +'";';
+    // Test query using string on mysql
+    //console.log(qString);
+    // Make query
+    con.query(qString, function(err, rows){
+      if(err) throw err;
+      // Clean up the response rows into a nice usable JSON object
+      userList.dname = rows[0].deck_name;
+      userList.ddesc = rows[0].deck_desc;
       res.render('profile', userList);
     });
   }
@@ -486,13 +509,54 @@ app.get('/editfriends', function(req, res) {
   });
 });
 
+app.get('/editdeck', function(req, res) {
+  verifyLogin(req, function(result) {
+    if (result) {
+      var cookieui = req.cookies.userId;
+      var cardList = {id: [], name: [], type: "deck", owner: ""};
+      var qString = "";
+      qString = qString + 'SELECT deck_id FROM deck WHERE deck_owner = "' + cookieui +'";';
+      //console.log(qString);
+      // Make query
+      con.query(qString, function(err, rows){
+        if(err) throw err;
+        // Clean up the response rows into a nice usable JSON object
+        console.log(Object.keys(rows[0]))
+        cardList.owner = rows[0].deck_id;
+        var qString2 = "";
+        qString2 = qString2 + 'SELECT card_num, name ';
+        qString2 = qString2 + 'FROM deck_card INNER JOIN mtgcard ON ';
+        qString2 = qString2 + 'mtgcard.id = deck_card.card_num ';
+        qString2 = qString2 + 'WHERE deck_card.deck_id = "' + cardList.owner +'";';
+        //console.log(qString2);
+        con.query(qString2, function(err, rows){
+          if(err) throw err;
+          // Clean up the response
+          for (var k = 0; k < rows.length; k++) {
+            cardList.id.push(rows[k].card_num);
+            cardList.name.push(rows[k].name);
+          }
+          console.log(cardList);
+          res.render('editlists', cardList);
+        });
+      });
+    } else {
+      res.render('/');
+    }
+  });
+});
+
+
 app.get('/process_\(*\)', function(req, res) {
   var inputs = req.url.slice(9);
   inputs = inputs.split("_");
   verifyLogin(req, function(result) {
     if (result) {
       var ui = req.cookies.userId;
+      var deckid = "";
 
+      console.log("processing ", inputs[0]);
+      // This processes an add friend request then updates the page
       if (inputs[0] == "addfriend") {
         console.log("adding friend: ", inputs[1]);
         obj_insert = {user_id: ui, friend_id: inputs[1]};
@@ -512,6 +576,7 @@ app.get('/process_\(*\)', function(req, res) {
         }
       }
 
+      // This processes a remove friend request then updates the page
       if (inputs[0] == "rmfriend") {
         console.log("removing friend: ", inputs[1]);
         obj_insert = {user_id: ui, friend_id: inputs[1]};
@@ -520,14 +585,41 @@ app.get('/process_\(*\)', function(req, res) {
           res.redirect(inputs[2]);
         });
       }
+
+      // This processes an add card to deck request
+      if (inputs[0] == "addcard") {
+        console.log("Adding card to deck: ", inputs[1]);
+        obj_insert = {deck_id: "", card_num: inputs[1]};
+        con.query('SELECT deck_id FROM deck WHERE deck_owner="'+ui+'"', function(err, rows){
+          if(err) throw err;
+          obj_insert.deck_id = rows[0].deck_id;
+          con.query('INSERT INTO deck_card SET ?', obj_insert, function(err, rows){
+            if(err) throw err;
+            res.redirect(inputs[2]);
+          });
+        });
+      }
+
+      // This processes a remove card request then updates the page
+      if (inputs[0] == "rmcard") {
+        console.log("removing card: ", inputs[1]);
+        con.query('SELECT deck_id FROM deck WHERE deck_owner="'+ui+'"', function(err, rows){
+          if(err) throw err;
+          var d_id = rows[0].deck_id;
+          con.query('DELETE FROM deck_card WHERE deck_id="'+d_id+'" AND card_num="'+inputs[1]+'"', function(err, rows){
+            if(err) throw err;
+            res.redirect(inputs[2]);
+          });
+        });
+      }
+
     } else {
-      res.redirect('signIn');
+      res.redirect('../signIn');
     }
   });
 });
 
 app.get('/:id\([0-9]+\)', function(req, res) {
-  var data = {key: "Ayyy lmao"}
   //console.log(Object.keys(req));
   var cardNumber = req.url.slice(1);
   console.log("Fetching card number: ", cardNumber);
@@ -666,5 +758,5 @@ app.get('/:id\(u[0-9]+\)', function(req, res) {
 });
 
 // Start server
-//app.listen(9001, function() { console.log('Server listening on port 9001!'); });
-app.listen(9000, function() { console.log('Test Server!'); });
+app.listen(9001, function() { console.log('Server listening on port 9001!'); });
+//app.listen(9000, function() { console.log('Test Server!'); });

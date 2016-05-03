@@ -43,6 +43,8 @@ html(lang='en')
           .well.m_well.text-center.col-sm-offset-2.col-sm-8
             h3 #{name}
             h3 #{type}
+            button(class="btn")#addcard.btn.btn-primary Add to my deck!
+            button(class="btn")#rmcard.btn.btn-danger Remove from my deck!
       .row
         .col-sm-offset-2.col-sm-8
           .well.m_well.text-center.col-sm-offset-2.col-sm-8
@@ -61,6 +63,17 @@ html(lang='en')
             p From set: #{setName}, Card No. #{setNum}
             p Rarity: #{rarity}
             p Released: #{releaseDate}
+
+    script(type='text/javascript').
+      document.getElementById('addcard').addEventListener("click", function() {
+        window.alert("Adding card!");
+        window.location.assign('/process_addcard_' + #{id} + '_/' + #{id});
+      });
+    script(type='text/javascript').
+      document.getElementById('rmcard').addEventListener("click", function() {
+        window.alert("Card will be removed if it exists in your deck.");
+        window.location.assign('/process_rmcard_' + #{id} + '_/editdeck');
+      });
     // jQuery (necessary for Bootstrap's JavaScript plugins)
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js')
     // Include all compiled plugins (below), or include individual files as needed

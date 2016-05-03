@@ -63,8 +63,9 @@ html(lang='en')
         .well.m_well.text-center.col-sm-offset-1.col-sm-4
           h2 My Deck
           p
-            button(class="btn")#myBtn.btn.btn-primary Edit Deck
-          p No Deck!
+            button(class="btn")#editdeck.btn.btn-primary Edit Deck
+          h3 #{dname}
+          h4 #{ddesc}
 
     script(type='text/javascript').
       document.getElementById('editp').addEventListener("click", function() {
@@ -73,6 +74,10 @@ html(lang='en')
     script(type='text/javascript').
       document.getElementById('editf').addEventListener("click", function() {
         window.location.assign('/editfriends');
+      });
+    script(type='text/javascript').
+      document.getElementById('editdeck').addEventListener("click", function() {
+        window.location.assign('/editdeck');
       });
 
     // closing main container div
